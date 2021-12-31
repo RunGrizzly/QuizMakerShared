@@ -8,7 +8,13 @@ using UnityEngine;
 public class NakamaConnection : MonoBehaviour
 {
 
-    Connection connection;
+    public Connection connection;
+
+    void Start()
+    {
+        GetNewConnection();
+    }
+
 
     //Get a new connection and autheticate it with the server
     public async void GetNewConnection()
@@ -57,9 +63,6 @@ public class NakamaConnection : MonoBehaviour
             Debug.Log("Found match with room code " + roomQuery + " , with match ID " + match.MatchId);
             Debug.Log("Joining the matched room");
             await connection.socket.JoinMatchAsync(match.MatchId);
-
-
-
         }
 
         //If we get more than one hit (duplicate room codes)
@@ -75,4 +78,6 @@ public class NakamaConnection : MonoBehaviour
             Debug.Log("No matches were found with " + roomQuery);
         }
     }
+
+
 }

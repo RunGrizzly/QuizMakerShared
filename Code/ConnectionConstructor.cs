@@ -36,7 +36,7 @@ public static class ConnectionConstructor
 
         try
         {
-            newSession = await newClient.AuthenticateDeviceAsync(deviceId);
+            newSession = await newClient.AuthenticateDeviceAsync(deviceId, _username);
         }
         catch (Exception e)
         {
