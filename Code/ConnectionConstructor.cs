@@ -77,15 +77,20 @@ public static class ConnectionConstructor
 
             if (matchState.OpCode == OpCodes.generic)
             {
+
+                Debug.Log("Received via op code generic.");
                 string messageJson = System.Text.Encoding.UTF8.GetString(matchState.State);
-                Debug.Log(messageJson);
+                Debug.Log("Created JSON string from passed byte array.");
+                GenericMessage gm = JsonConvert.DeserializeObject<GenericMessage>(messageJson);
+
+
+                Debug.Log("Created created a generic message from json.");
+                Debug.Log(gm.message);
             }
 
             else if (matchState.OpCode == OpCodes.boolean)
             {
-                // Debug.Log(matchState);
-                // Debug.Log(matchState.State);
-
+                Debug.Log("Received via op code boolean.");
                 string boolJson = System.Text.Encoding.UTF8.GetString(matchState.State);
                 bool randBool = JsonParser.FromJson<bool>(boolJson);
                 Debug.Log(randBool);
@@ -93,9 +98,7 @@ public static class ConnectionConstructor
 
             else if (matchState.OpCode == OpCodes.complex)
             {
-                // Debug.Log(matchState);
-                // Debug.Log(matchState.State);
-
+                Debug.Log("Received via op code complex.");
                 string complexJson = System.Text.Encoding.UTF7.GetString(matchState.State);
 
                 Debug.Log("A complex string was created from match state broadcast");
@@ -114,16 +117,6 @@ public static class ConnectionConstructor
 
                 Debug.Log("A generic message was bundled with the complex data: " + message + ", " + randBool + ", " + i + ", " + f);
 
-                // GenericMessage complexString = JsonParser.FromJson<GenericMessage>(complexJson);
-                // RandomBool complexBool = JsonParser.FromJson<RandomBool>(complexJson);
-                // Vector3 complexV3 = JsonParser.FromJson<Vector3>(complexJson);
-                // GameObject complexGO = JsonParser.FromJson<GameObject>(complexJson);
-
-                // Debug.Log("Attempting to parse a complex data object...");
-                // Debug.Log("Complex string = " + complexString);
-                // Debug.Log("Complex bool = " + complexBool);
-                // // Debug.Log("Complex vector3 = " + complexV3);
-                // // Debug.Log("Complex gameobject = " + complexGO);
             }
 
 
