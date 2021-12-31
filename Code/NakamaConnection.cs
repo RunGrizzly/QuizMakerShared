@@ -5,9 +5,15 @@ using System.Linq;
 using Nakama;
 using UnityEngine;
 
+
 public class GenericMessage
 {
     public string message;
+
+    public GenericMessage(string _message)
+    {
+        message = _message;
+    }
 }
 
 public class RandomBool
@@ -20,12 +26,10 @@ public class ComplexDataObject
 {
     public GenericMessage genericMessage;
     public RandomBool randomBool;
-    // public GameObject gameObject;
-    // public Vector3 position = Vector3.zero;
-
     public int i;
 
     public float f;
+
     public ComplexDataObject(GenericMessage _genericMessage, RandomBool _randomBool, int _int, float _float)
     {
         genericMessage = _genericMessage;
@@ -36,7 +40,6 @@ public class ComplexDataObject
 
 
 }
-
 public class NakamaConnection : MonoBehaviour
 {
 
