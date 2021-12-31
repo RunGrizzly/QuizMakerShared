@@ -62,57 +62,7 @@ public static class ConnectionConstructor
         }
         );
 
-        newSocket.ReceivedMatchState += (matchState) =>
-        {
-            Debug.Log("Client: " + _username + " received a message");
-
-            if (matchState.OpCode == OpCodes.generic)
-            {
-
-                Debug.Log("Received via op code generic.");
-                string messageJson = System.Text.Encoding.UTF8.GetString(matchState.State);
-                Debug.Log("Created JSON string from passed byte array.");
-                GenericMessage gm = JsonConvert.DeserializeObject<GenericMessage>(messageJson);
-
-
-                Debug.Log("Created created a generic message from json.");
-                Debug.Log(gm.message);
-            }
-
-            else if (matchState.OpCode == OpCodes.boolean)
-            {
-                Debug.Log("Received via op code boolean.");
-                string boolJson = System.Text.Encoding.UTF8.GetString(matchState.State);
-                bool randBool = JsonParser.FromJson<bool>(boolJson);
-                Debug.Log(randBool);
-            }
-
-            else if (matchState.OpCode == OpCodes.boolean)
-            {
-                Debug.Log("Received via op code boolean.");
-                string boolJson = System.Text.Encoding.UTF8.GetString(matchState.State);
-                bool randBool = JsonParser.FromJson<bool>(boolJson);
-                Debug.Log(randBool);
-            }
-
-            else if (matchState.OpCode == OpCodes.complex)
-            {
-                Debug.Log("Received via op code complex.");
-                string complexJson = System.Text.Encoding.UTF7.GetString(matchState.State);
-
-                Debug.Log("A complex string was created from match state broadcast");
-                Debug.Log("The string looks like this: " + complexJson);
-
-                ComplexDataObject root = JsonConvert.DeserializeObject<ComplexDataObject>(complexJson);
-
-                string message = root.genericMessage.message.ToString();
-                bool randBool = root.randomBool.randomBool;
-                int i = root.i;
-                float f = root.f;
-
-                Debug.Log("A generic message was bundled with the complex data: " + message + ", " + randBool + ", " + i + ", " + f);
-            }
-        };
+        ConnectionSubscriber.AddToSocket(newSocket);
 
         newSocket.Connected += () => Debug.Log("Client: " + _username + " socket connected");
         newSocket.Closed += () => Debug.LogFormat("Client: " + _username + " socket closed");
