@@ -5,41 +5,6 @@ using System.Linq;
 using Nakama;
 using UnityEngine;
 
-
-public class GenericMessage
-{
-    public string message;
-
-    public GenericMessage(string _message)
-    {
-        message = _message;
-    }
-}
-
-public class RandomBool
-{
-    public bool randomBool;
-}
-
-[Serializable]
-public class ComplexDataObject
-{
-    public GenericMessage genericMessage;
-    public RandomBool randomBool;
-    public int i;
-
-    public float f;
-
-    public ComplexDataObject(GenericMessage _genericMessage, RandomBool _randomBool, int _int, float _float)
-    {
-        genericMessage = _genericMessage;
-        randomBool = _randomBool;
-        i = _int;
-        f = _float;
-    }
-
-
-}
 public class NakamaConnection : MonoBehaviour
 {
 
@@ -59,6 +24,7 @@ public class NakamaConnection : MonoBehaviour
     {
         Debug.Log("CLIENT: Attempting to join match");
 
+        //If we have not yet established a connection with GetNewConnection
         if (connection == null)
         {
             Debug.Log("Not authenticated on the server. Please authenticate the device.");
@@ -72,7 +38,9 @@ public class NakamaConnection : MonoBehaviour
 
         try
         {
-            info = await connection.client.ListMatchesAsync(connection.session, 0, 100, 1, true, roomQuery, null);
+            //List matches available to the client using the room query to match roomcode label
+            //Make non case sensitive with to upper
+            info = await connection.client.ListMatchesAsync(connection.session, 0, 100, 1, true, roomQuery.ToUpper(), null);
         }
         catch (Exception e)
         {
@@ -80,10 +48,10 @@ public class NakamaConnection : MonoBehaviour
         }
 
 
-
+        //If we get a hit (1 is returned)
         if (info.Matches.Count() == 1)
         {
-
+            //Join the hit (the only returned match will be at element 0)
             var match = info.Matches.ElementAt(0);
 
             Debug.Log("Found match with room code " + roomQuery + " , with match ID " + match.MatchId);
@@ -94,6 +62,9 @@ public class NakamaConnection : MonoBehaviour
 
         }
 
+        //If we get more than one hit (duplicate room codes)
+        //Exit out
+        //TODO: Look at maintaining unique room codes
         else if (info.Matches.Count() > 1)
         {
             Debug.Log("Conflict: Found multiple matches with room code " + roomQuery + " , please provide unique room code");
