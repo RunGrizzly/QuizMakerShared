@@ -87,6 +87,14 @@ public static class ConnectionConstructor
                 Debug.Log(randBool);
             }
 
+            else if (matchState.OpCode == OpCodes.boolean)
+            {
+                Debug.Log("Received via op code boolean.");
+                string boolJson = System.Text.Encoding.UTF8.GetString(matchState.State);
+                bool randBool = JsonParser.FromJson<bool>(boolJson);
+                Debug.Log(randBool);
+            }
+
             else if (matchState.OpCode == OpCodes.complex)
             {
                 Debug.Log("Received via op code complex.");
