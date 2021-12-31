@@ -23,10 +23,7 @@ public static class ConnectionConstructor
 
         string newID = SpoofID(); //Unique to the "session user" - so a device basically
 
-        //TODO:Android devices cannot complete this session activation
-        // //create a session between the created client and the server
-        // ISession newSession = await newClient.AuthenticateDeviceAsync(newID, _username + (Random.Range(0, 999).ToString()));
-
+        //Create a session between the created client and the server
         var deviceId = PlayerPrefs.GetString("nakama.deviceid");
 
         if (string.IsNullOrEmpty(deviceId))
@@ -35,15 +32,11 @@ public static class ConnectionConstructor
             PlayerPrefs.SetString("nakama.deviceid", deviceId); // cache device id.
         }
 
-
-
         ISession newSession = null;
 
         try
         {
             newSession = await newClient.AuthenticateDeviceAsync(deviceId);
-            // Debug.LogFormat("New user: {0}, {1}", session.Created, newSession);
-            // newSession = await newClient.AuthenticateDeviceAsync(newID, _username + (Random.Range(0, 999).ToString()), false);
         }
         catch (Exception e)
         {
@@ -54,8 +47,6 @@ public static class ConnectionConstructor
         Debug.Log("COMPLETE: A new session was started");
 
         Debug.Log("Client: " + _username + " was authenticated.");
-
-
 
         //Open up a socket on the new client
         ISocket newSocket = newClient.NewSocket();
@@ -104,9 +95,6 @@ public static class ConnectionConstructor
                 Debug.Log("A complex string was created from match state broadcast");
                 Debug.Log("The string looks like this: " + complexJson);
 
-
-
-
                 ComplexDataObject root = JsonConvert.DeserializeObject<ComplexDataObject>(complexJson);
 
                 string message = root.genericMessage.message.ToString();
@@ -114,21 +102,12 @@ public static class ConnectionConstructor
                 int i = root.i;
                 float f = root.f;
 
-
                 Debug.Log("A generic message was bundled with the complex data: " + message + ", " + randBool + ", " + i + ", " + f);
-
             }
-
-
         };
-
-
-
 
         newSocket.Connected += () => Debug.Log("Client: " + _username + " socket connected");
         newSocket.Closed += () => Debug.LogFormat("Client: " + _username + " socket closed");
-
-
 
         try
         {
@@ -141,7 +120,6 @@ public static class ConnectionConstructor
         {
             Debug.Log("SOCKET_EXCEPTION: " + e);
         }
-
 
         Debug.Log("SOCKET: Socket connection completed.");
 
