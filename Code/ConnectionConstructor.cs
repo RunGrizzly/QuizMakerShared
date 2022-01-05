@@ -71,13 +71,16 @@ public static class ConnectionConstructor
         {
             //Attach the socket to the session (the current interface between the client and the server)
             Debug.Log("SOCKET: Attempting socket connection.");
+            //Make sure we don't return until the socket is connected
 
-            await newSocket.ConnectAsync(newSession);
+            var task = newSocket.ConnectAsync(newSession);
+
         }
         catch (Exception e)
         {
             Debug.Log("SOCKET_EXCEPTION: " + e);
         }
+
 
         Debug.Log("SOCKET: Socket connection completed.");
 

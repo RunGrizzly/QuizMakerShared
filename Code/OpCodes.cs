@@ -9,4 +9,6 @@ public static class OpCodes
     public const long contestantWarning = 4;
     public const long sprite = 5;
 
+    public const long matchState = 6;
+
 }
