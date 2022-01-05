@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Nakama;
 using UnityEngine;
 
@@ -15,15 +16,37 @@ public class NakamaConnection : MonoBehaviour
         GetNewConnection();
     }
 
+    void Update()
+    {
+        if (connection != null)
+        {
+            Debug.Log("CLIENT: " + connection.client);
+            Debug.Log("SESSION: " + connection.session);
+            Debug.Log("SOCKET: " + connection.socket);
+
+            Debug.Log("The nakama connection socket has connected state: " + Brain.ins.nakamaConnection.connection.socket.IsConnected);
+        }
+        else Debug.Log("The nakama connection is null.");
+    }
+
 
     //Get a new connection and autheticate it with the server
     public async void GetNewConnection()
     {
+
+        connection = null;
+
         Debug.Log("CLIENT: Getting a new connection for the client.");
         connection = await ConnectionConstructor.GetNewConnection("New_client_connection");
         Debug.Log("CLIENT: New connection was established.");
         Debug.Log("CONNECTION - info: " + connection.socket.IsConnected);
     }
+
+    // public Task OpenSocket()
+    // {
+    //     var t = connection.socket.ConnectAsync(connection.session);
+    //     return t;
+    // }
 
 
     public async void TryJoinRoom(string roomQuery)
