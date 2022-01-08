@@ -42,7 +42,7 @@ public class NakamaConnection : MonoBehaviour
             if (connection.socket != null)
             {
                 Debug.Log("SOCKET: " + connection.socket);
-                Debug.Log("SOCKET: The nakama connection socket has connected state: " + Brain.ins.nakamaConnection.connection.socket.IsConnected);
+                Debug.Log("SOCKET: The nakama connection socket has connected state: " + connection.socket.IsConnected);
             }
             else
             {
