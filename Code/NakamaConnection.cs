@@ -20,13 +20,37 @@ public class NakamaConnection : MonoBehaviour
     {
         if (connection != null)
         {
-            Debug.Log("CLIENT: " + connection.client);
-            Debug.Log("SESSION: " + connection.session);
-            Debug.Log("SOCKET: " + connection.socket);
-
-            Debug.Log("The nakama connection socket has connected state: " + Brain.ins.nakamaConnection.connection.socket.IsConnected);
+            ////////////////////////////
+            if (connection.client != null)
+            {
+                Debug.Log("CLIENT: " + connection.client);
+            }
+            else
+            {
+                Debug.Log("CLIENT: the nakama connection has not established a client");
+            }
+            ////////////////////////////
+            if (connection.session != null)
+            {
+                Debug.Log("SESSION: " + connection.session);
+            }
+            else
+            {
+                Debug.Log("SESSION: the nakama connection does not have an active session");
+            }
+            ////////////////////////////
+            if (connection.socket != null)
+            {
+                Debug.Log("SOCKET: " + connection.socket);
+                Debug.Log("SOCKET: The nakama connection socket has connected state: " + Brain.ins.nakamaConnection.connection.socket.IsConnected);
+            }
+            else
+            {
+                Debug.Log("SESSION: the nakama connection does not have an active socket");
+            }
+            ////////////////////////////
         }
-        else Debug.Log("The nakama connection is null.");
+        else Debug.Log("The nakama connection is null");
     }
 
 

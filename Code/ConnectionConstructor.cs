@@ -55,7 +55,7 @@ public static class ConnectionConstructor
         Debug.Log("SOCKET: Socket info: " + newSocket.ToJson());
 
         // Add a function that closes the new socket on appQuit
-        Brain.ins.eventManager.appQuitEvent.AddListener
+        Brain.ins.eventManager.e_appQuit.AddListener
         (() =>
         {
             newSocket.CloseAsync();
