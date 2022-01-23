@@ -8,7 +8,7 @@ public static class OpCodes
     public const long complex = 3;
     public const long contestantWarning = 4;
     public const long sprite = 5;
-
-    public const long matchState = 6;
+    public const long ask = 6;
+    public const long matchState = 66;
 
 }

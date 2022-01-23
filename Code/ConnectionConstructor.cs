@@ -11,13 +11,12 @@ using Random = UnityEngine.Random;
 
 public static class ConnectionConstructor
 {
-
-    public static async Task<Connection> GetNewConnection(string _username)
+    public static async Task<Connection> GetNewConnection(string _username, string connectIP)
     {
         Debug.Log("Activating a new client");
 
         //Create a new client and give it the nakama server credentials
-        IClient newClient = new Client("http", "192.168.8.111", 7350, "defaultkey");
+        IClient newClient = new Client("http", connectIP, 7350, "defaultkey");
 
         Debug.Log("COMPLETE:Activated a new client");
 
@@ -40,11 +39,11 @@ public static class ConnectionConstructor
         }
         catch (Exception e)
         {
+            Debug.Log("EXCEPTION: Client could not be authenticated. A session was not started.");
             Debug.Log("EXCEPTION: " + e);
         }
 
-
-        Debug.Log("COMPLETE: A new session was started");
+        // Debug.Log("COMPLETE: A new session was started");
 
         Debug.Log("Client: " + _username + " was authenticated.");
 
@@ -71,21 +70,19 @@ public static class ConnectionConstructor
         {
             //Attach the socket to the session (the current interface between the client and the server)
             Debug.Log("SOCKET: Attempting socket connection.");
-            //Make sure we don't return until the socket is connected
 
             var task = newSocket.ConnectAsync(newSession);
-
         }
         catch (Exception e)
         {
             Debug.Log("SOCKET_EXCEPTION: " + e);
+            Debug.Log("QUITTING DUE TO SOCKET CONNECTION ERROR.");
+            UnityEditor.EditorApplication.isPlaying = false;
         }
-
 
         Debug.Log("SOCKET: Socket connection completed.");
 
         return new Connection(newClient, newSession, newSocket);
-
     }
 
     public static string SpoofID()
@@ -97,8 +94,6 @@ public static class ConnectionConstructor
 
         return stringRoots[Random.Range(0, stringRoots.Length)] + "_" + stringBases[Random.Range(0, stringBases.Length)] + "_" + stringMods[Random.Range(0, stringMods.Length)];
     }
-
-
 }
 
 

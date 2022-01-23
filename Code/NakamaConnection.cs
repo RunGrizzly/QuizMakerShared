@@ -11,6 +11,8 @@ public class NakamaConnection : MonoBehaviour
 
     public Connection connection;
 
+    public string connectIP;
+
     void Start()
     {
         GetNewConnection();
@@ -61,7 +63,7 @@ public class NakamaConnection : MonoBehaviour
         connection = null;
 
         Debug.Log("CLIENT: Getting a new connection for the client.");
-        connection = await ConnectionConstructor.GetNewConnection("New_client_connection");
+        connection = await ConnectionConstructor.GetNewConnection("New_client_connection", connectIP);
         Debug.Log("CLIENT: New connection was established.");
         Debug.Log("CONNECTION - info: " + connection.socket.IsConnected);
     }
@@ -114,7 +116,7 @@ public class NakamaConnection : MonoBehaviour
 
         //If we get more than one hit (duplicate room codes)
         //Exit out
-        //TODO: Look at maintaining unique room codes
+        //TODO: Look at maintaining unique room codes so there can't be duplicates
         else if (info.Matches.Count() > 1)
         {
             Debug.Log("Conflict: Found multiple matches with room code " + roomQuery + " , please provide unique room code");
