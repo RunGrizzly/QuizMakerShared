@@ -5,87 +5,74 @@ using Nakama;
 using Nakama.TinyJson;
 using Newtonsoft.Json;
 using UnityEngine;
+using Gameshow.Host;
 
 using Random = UnityEngine.Random;
 
 
 public static class ConnectionConstructor
 {
-    public static async Task<Connection> GetNewConnection(string _username, string connectIP)
+    public static async Task<Connection> GetNewConnection(string displayName, string connectIP)
     {
-        Debug.Log("Activating a new client");
+        //New Client/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        //Create a new client and give it the nakama server credentials
-        IClient newClient = new Client("http", connectIP, 7350, "defaultkey");
+        IClient newClient = null; //Create a new client and give it the nakama server credentials
+                                  //A new client is a brand new, authenticated client that is stored on the nakama server
 
-        Debug.Log("COMPLETE:Activated a new client");
-
-        string newID = SpoofID(); //Unique to the "session user" - so a device basically
-
-        //Create a session between the created client and the server
-        var deviceId = PlayerPrefs.GetString("nakama.deviceid");
-
-        if (string.IsNullOrEmpty(deviceId))
+        try
         {
-            deviceId = SystemInfo.deviceUniqueIdentifier;
-            PlayerPrefs.SetString("nakama.deviceid", deviceId); // cache device id.
+            newClient = new Client("http", connectIP, 7350, "defaultkey");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("EXCEPTION: A new client could not be created");
+            Debug.LogWarning("EXCEPTION: " + e);
         }
 
+        //New Session////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ISession newSession = null;
 
         try
         {
-            newSession = await newClient.AuthenticateDeviceAsync(deviceId, newID);
+            newSession = await newClient.AuthenticateDeviceAsync(DeviceID(), SystemInfo.deviceName);
         }
         catch (Exception e)
         {
-            Debug.Log("EXCEPTION: Client could not be authenticated. A session was not started.");
-            Debug.Log("EXCEPTION: " + e);
+            Debug.LogWarning("EXCEPTION: Client could not be authenticated. A session was not started.");
+            Debug.LogWarning("EXCEPTION: " + e);
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // Debug.Log("COMPLETE: A new session was started");
-
-        Debug.Log("Client: " + _username + " was authenticated.");
-
-        //Open up a socket on the new client
+        //New Socket/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ISocket newSocket = newClient.NewSocket();
 
-        Debug.Log("SOCKET: New socket variable created.");
-        Debug.Log("SOCKET: Socket info: " + newSocket.ToJson());
-
-        // Add a function that closes the new socket on appQuit
-        Brain.ins.eventManager.e_appQuit.AddListener
-        (() =>
-        {
-            newSocket.CloseAsync();
-        }
-        );
-
         ConnectionSubscriber.AddToSocket(newSocket);
-
-        newSocket.Connected += () => Debug.Log("Client: " + _username + " socket connected");
-        newSocket.Closed += () => Debug.LogFormat("Client: " + _username + " socket closed");
+        newSocket.Connected += () => Debug.Log("Client: " + displayName + " socket connected");
+        newSocket.Closed += () => Debug.LogFormat("Client: " + displayName + " socket closed");
 
         try
         {
             //Attach the socket to the session (the current interface between the client and the server)
-            Debug.Log("SOCKET: Attempting socket connection.");
-
             var task = newSocket.ConnectAsync(newSession);
         }
         catch (Exception e)
         {
-            Debug.Log("SOCKET_EXCEPTION: " + e);
-            Debug.Log("QUITTING DUE TO SOCKET CONNECTION ERROR.");
-            UnityEditor.EditorApplication.isPlaying = false;
+            Application.Quit();
         }
 
-        Debug.Log("SOCKET: Socket connection completed.");
+        //Ammend the new account
+        string newDisplayName = string.IsNullOrEmpty(displayName) ? GetSpoofDisplayName() : displayName; //A display name that is assigned to the client on authentication
+
+        await newClient.UpdateAccountAsync(newSession, newSession.Username, newDisplayName/*, "https://hungarytoday.hu/wp-content/uploads/2020/05/84261763_657262308148775_2968667943157628928_o-e1589799341315.jpg", "en"*/);
 
         return new Connection(newClient, newSession, newSocket);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
-    public static string SpoofID()
+    public static string GetSpoofDisplayName()
     {
         // string[] stringBases = new string[] { "stegosaurus", "tyrannosaurus", "diplodocus", "anklyosaurus", "dimerotron", "tricerotops" };
         string[] stringRoots = new string[] { "mental", "silly" };
@@ -93,6 +80,22 @@ public static class ConnectionConstructor
         string[] stringBases = new string[] { "max", "aria", "dj", "lubo" };
 
         return stringRoots[Random.Range(0, stringRoots.Length)] + "_" + stringBases[Random.Range(0, stringBases.Length)] + "_" + stringMods[Random.Range(0, stringMods.Length)];
+    }
+
+
+    public static string DeviceID()
+    {
+
+        //return "00020215147461";
+
+        string deviceID = PlayerPrefs.GetString("nakama.deviceid"); //Get the unique device ID from player prefs that will be used to handcuff the device to the new account
+
+        if (string.IsNullOrEmpty(deviceID))
+        {
+            deviceID = SystemInfo.deviceUniqueIdentifier;
+            PlayerPrefs.SetString("nakama.deviceid", deviceID); // Cache device id.
+        }
+        return deviceID;
     }
 }
 

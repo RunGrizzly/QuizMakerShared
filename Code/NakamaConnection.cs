@@ -8,11 +8,11 @@ using UnityEngine;
 
 public class NakamaConnection : MonoBehaviour
 {
+    [field: SerializeField] public Connection Connection { get; private set; } = null;
+    [field: SerializeField] public string ConnectIP;
+    [field: SerializeField] public string DisplayName { get; set; }
 
-    public Connection connection;
-
-    public string connectIP;
-
+    //Immediately get a connection to the nakama server on start
     void Start()
     {
         GetNewConnection();
@@ -20,31 +20,34 @@ public class NakamaConnection : MonoBehaviour
 
     void Update()
     {
-        if (connection != null)
+
+        //   return;
+
+        if (Connection != null)
         {
             ////////////////////////////
-            if (connection.client != null)
+            if (Connection.client != null)
             {
-                Debug.Log("CLIENT: " + connection.client);
+                Debug.Log("CLIENT: " + Connection.client);
             }
             else
             {
                 Debug.Log("CLIENT: the nakama connection has not established a client");
             }
             ////////////////////////////
-            if (connection.session != null)
+            if (Connection.session != null)
             {
-                Debug.Log("SESSION: " + connection.session);
+                Debug.Log("SESSION: " + Connection.session);
             }
             else
             {
                 Debug.Log("SESSION: the nakama connection does not have an active session");
             }
             ////////////////////////////
-            if (connection.socket != null)
+            if (Connection.socket != null)
             {
-                Debug.Log("SOCKET: " + connection.socket);
-                Debug.Log("SOCKET: The nakama connection socket has connected state: " + connection.socket.IsConnected);
+                Debug.Log("SOCKET: " + Connection.socket);
+                Debug.Log("SOCKET: The nakama connection socket has connected state: " + Connection.socket.IsConnected);
             }
             else
             {
@@ -60,27 +63,31 @@ public class NakamaConnection : MonoBehaviour
     public async void GetNewConnection()
     {
 
-        connection = null;
+        Connection = null;
 
         Debug.Log("CLIENT: Getting a new connection for the client.");
-        connection = await ConnectionConstructor.GetNewConnection("New_client_connection", connectIP);
+        Connection = await ConnectionConstructor.GetNewConnection(DisplayName, ConnectIP);
         Debug.Log("CLIENT: New connection was established.");
-        Debug.Log("CONNECTION - info: " + connection.socket.IsConnected);
+        Debug.Log("CONNECTION - info: " + Connection.socket.IsConnected);
     }
 
-    // public Task OpenSocket()
-    // {
-    //     var t = connection.socket.ConnectAsync(connection.session);
-    //     return t;
-    // }
+    public async void KillConnection()
+    {
+        if (Connection == null)
+        {
+            return;
+        }
 
+        await Connection.socket.CloseAsync();
+        Connection = null;
+    }
 
     public async void TryJoinRoom(string roomQuery)
     {
         Debug.Log("CLIENT: Attempting to join match");
 
         //If we have not yet established a connection with GetNewConnection
-        if (connection == null)
+        if (Connection == null)
         {
             Debug.Log("Not authenticated on the server. Please authenticate the device.");
             return;
@@ -95,7 +102,7 @@ public class NakamaConnection : MonoBehaviour
         {
             //List matches available to the client using the room query to match roomcode label
             //Make non case sensitive with to upper
-            info = await connection.client.ListMatchesAsync(connection.session, 0, 100, 1, true, roomQuery.ToUpper(), null);
+            info = await Connection.client.ListMatchesAsync(Connection.session, 0, 100, 1, true, roomQuery.ToUpper(), null);
         }
         catch (Exception e)
         {
@@ -111,7 +118,7 @@ public class NakamaConnection : MonoBehaviour
 
             Debug.Log("Found match with room code " + roomQuery + " , with match ID " + match.MatchId);
             Debug.Log("Joining the matched room");
-            await connection.socket.JoinMatchAsync(match.MatchId);
+            await Connection.socket.JoinMatchAsync(match.MatchId);
         }
 
         //If we get more than one hit (duplicate room codes)
