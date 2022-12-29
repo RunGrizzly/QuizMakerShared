@@ -1,27 +1,50 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Nakama;
 using UnityEngine;
+using UnityEngine.Events;
+
+public class ServerConnectionEvent : UnityEvent<Connection> { };
+public class ServerDisconnectionEvent : UnityEvent { };
+
+
 
 public class NakamaConnection : MonoBehaviour
 {
-    [field: SerializeField] public Connection Connection { get; private set; } = null;
+    [SerializeField] private bool m_debugServerStatus = false;
+
     [field: SerializeField] public string ConnectIP;
-    [field: SerializeField] public string DisplayName { get; set; }
+
+    // [field: SerializeField] public string DefaultUsername { get; set; }
+
+    public Connection Connection { get; private set; } = null;
+
+    //Transparency to the client whenever a new connection is made
+    public ServerConnectionEvent ServerConnectionEvent { get; private set; } = null;
+    public ServerDisconnectionEvent ServerDisconnectionEvent { get; private set; } = null;
+
+    private void OnEnable()
+    {
+        ServerConnectionEvent = new ServerConnectionEvent();
+        ServerDisconnectionEvent = new ServerDisconnectionEvent();
+    }
+
+    private void OnDisable()
+    {
+        ServerConnectionEvent.RemoveAllListeners();
+        ServerDisconnectionEvent.RemoveAllListeners();
+    }
 
     //Immediately get a connection to the nakama server on start
-    void Start()
+    private void Start()
     {
         GetNewConnection();
     }
 
-    void Update()
+    private void Update()
     {
 
-        //   return;
+        if (!m_debugServerStatus) return;
 
         if (Connection != null)
         {
@@ -62,11 +85,10 @@ public class NakamaConnection : MonoBehaviour
     //Get a new connection and autheticate it with the server
     public async void GetNewConnection()
     {
-
         Connection = null;
 
         Debug.Log("CLIENT: Getting a new connection for the client.");
-        Connection = await ConnectionConstructor.GetNewConnection(DisplayName, ConnectIP);
+        Connection = await ConnectionConstructor.GetNewConnection(ConnectIP);
         Debug.Log("CLIENT: New connection was established.");
         Debug.Log("CONNECTION - info: " + Connection.socket.IsConnected);
     }

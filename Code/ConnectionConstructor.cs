@@ -1,24 +1,26 @@
 using System;
-using System.Text;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Nakama;
-using Nakama.TinyJson;
-using Newtonsoft.Json;
+
 using UnityEngine;
-using Gameshow.Host;
+
 
 using Random = UnityEngine.Random;
 
 
 public static class ConnectionConstructor
 {
-    public static async Task<Connection> GetNewConnection(string displayName, string connectIP)
+    public static async Task<Connection> GetNewConnection(string connectIP = null)
     {
         //New Client/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         IClient newClient = null; //Create a new client and give it the nakama server credentials
                                   //A new client is a brand new, authenticated client that is stored on the nakama server
+
+        string username = GetSpoofUsername();
 
         try
         {
@@ -36,7 +38,7 @@ public static class ConnectionConstructor
 
         try
         {
-            newSession = await newClient.AuthenticateDeviceAsync(DeviceID(), SystemInfo.deviceName);
+            newSession = await newClient.AuthenticateDeviceAsync(DeviceID(), null, true);
         }
         catch (Exception e)
         {
@@ -47,15 +49,13 @@ public static class ConnectionConstructor
 
         //New Socket/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ISocket newSocket = newClient.NewSocket();
-
-        ConnectionSubscriber.AddToSocket(newSocket);
-        newSocket.Connected += () => Debug.Log("Client: " + displayName + " socket connected");
-        newSocket.Closed += () => Debug.LogFormat("Client: " + displayName + " socket closed");
+        ISocket newSocket = null;
 
         try
         {
             //Attach the socket to the session (the current interface between the client and the server)
+            newSocket = newClient.NewSocket();
+            ConnectionSubscriber.AddToSocket(newSocket);
             var task = newSocket.ConnectAsync(newSession);
         }
         catch (Exception e)
@@ -63,16 +63,19 @@ public static class ConnectionConstructor
             Application.Quit();
         }
 
-        //Ammend the new account
-        string newDisplayName = string.IsNullOrEmpty(displayName) ? GetSpoofDisplayName() : displayName; //A display name that is assigned to the client on authentication
+        //Create new connection
+        Connection newConnection = new Connection(newClient, newSession, newSocket);
 
-        await newClient.UpdateAccountAsync(newSession, newSession.Username, newDisplayName/*, "https://hungarytoday.hu/wp-content/uploads/2020/05/84261763_657262308148775_2968667943157628928_o-e1589799341315.jpg", "en"*/);
+        newSocket.Connected += () => Debug.Log("Client: " + newSession.Username + " socket connected");
+        newSocket.Closed += () => Debug.LogFormat("Client: " + newSession.Username + " socket closed");
 
-        return new Connection(newClient, newSession, newSocket);
+        Brain.ins.connection.ServerConnectionEvent.Invoke(newConnection);
+
+        return newConnection;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
-    public static string GetSpoofDisplayName()
+    public static string GetSpoofUsername()
     {
         // string[] stringBases = new string[] { "stegosaurus", "tyrannosaurus", "diplodocus", "anklyosaurus", "dimerotron", "tricerotops" };
         string[] stringRoots = new string[] { "mental", "silly" };
@@ -85,9 +88,6 @@ public static class ConnectionConstructor
 
     public static string DeviceID()
     {
-
-        //return "00020215147461";
-
         string deviceID = PlayerPrefs.GetString("nakama.deviceid"); //Get the unique device ID from player prefs that will be used to handcuff the device to the new account
 
         if (string.IsNullOrEmpty(deviceID))
