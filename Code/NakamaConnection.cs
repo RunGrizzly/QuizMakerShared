@@ -7,21 +7,20 @@ using UnityEngine.Events;
 public class ServerConnectionEvent : UnityEvent<Connection> { };
 public class ServerDisconnectionEvent : UnityEvent { };
 
+public enum ConnectionType { Host, Client };
 
 
 public class NakamaConnection : MonoBehaviour
 {
+
     [SerializeField] private bool m_debugServerStatus = false;
+    [SerializeField] private ConnectionType m_connectAs;
 
     [field: SerializeField] public string ConnectIP;
 
-    // [field: SerializeField] public string DefaultUsername { get; set; }
-
-    public Connection Connection { get; private set; } = null;
-
-    //Transparency to the client whenever a new connection is made
-    public ServerConnectionEvent ServerConnectionEvent { get; private set; } = null;
-    public ServerDisconnectionEvent ServerDisconnectionEvent { get; private set; } = null;
+    public Connection Connection { get; private set; } = null; //The instance of this connection containing client, session and socket data
+    public ServerConnectionEvent ServerConnectionEvent { get; private set; } = null; //Transparency to the client whenever a new connection is made
+    public ServerDisconnectionEvent ServerDisconnectionEvent { get; private set; } = null; //Transparency to the client whenever a connection is dropped
 
     private void OnEnable()
     {
@@ -88,7 +87,7 @@ public class NakamaConnection : MonoBehaviour
         Connection = null;
 
         Debug.Log("CLIENT: Getting a new connection for the client.");
-        Connection = await ConnectionConstructor.GetNewConnection(ConnectIP);
+        Connection = await ConnectionConstructor.GetNewConnection(ConnectIP, m_connectAs);
         Debug.Log("CLIENT: New connection was established.");
         Debug.Log("CONNECTION - info: " + Connection.socket.IsConnected);
     }

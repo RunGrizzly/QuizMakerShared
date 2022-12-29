@@ -12,7 +12,7 @@ using Random = UnityEngine.Random;
 
 public static class ConnectionConstructor
 {
-    public static async Task<Connection> GetNewConnection(string connectIP = null)
+    public static async Task<Connection> GetNewConnection(string connectIP = null, ConnectionType m_connectAs = ConnectionType.Client)
     {
         //New Client/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ public static class ConnectionConstructor
 
         try
         {
-            newSession = await newClient.AuthenticateDeviceAsync(DeviceID(), null, true);
+            newSession = m_connectAs == ConnectionType.Client ? await newClient.AuthenticateDeviceAsync(DeviceID(), null, true) : await newClient.AuthenticateDeviceAsync(DeviceID(), "New Host", true);
         }
         catch (Exception e)
         {
