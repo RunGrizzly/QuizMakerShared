@@ -69,7 +69,7 @@ public static class ConnectionConstructor
         newSocket.Connected += () => Debug.Log("Client: " + newSession.Username + " socket connected");
         newSocket.Closed += () => Debug.LogFormat("Client: " + newSession.Username + " socket closed");
 
-        Brain.ins.connection.ServerConnectionEvent.Invoke(newConnection);
+        Brain.ins.Connection.ServerConnectionEvent.Invoke(newConnection);
 
         return newConnection;
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
