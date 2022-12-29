@@ -26,12 +26,14 @@ public class NakamaConnection : MonoBehaviour
     {
         ServerConnectionEvent = new ServerConnectionEvent();
         ServerDisconnectionEvent = new ServerDisconnectionEvent();
+        Debug.developerConsoleVisible = true;
     }
 
     private void OnDisable()
     {
         ServerConnectionEvent.RemoveAllListeners();
         ServerDisconnectionEvent.RemoveAllListeners();
+        Debug.developerConsoleVisible = false;
     }
 
     //Immediately get a connection to the nakama server on start
@@ -87,7 +89,7 @@ public class NakamaConnection : MonoBehaviour
         Connection = null;
 
         Debug.Log("CLIENT: Getting a new connection for the client.");
-        Connection = await ConnectionConstructor.GetNewConnection(ConnectIP, m_connectAs);
+        Connection = await ConnectionConstructor.GetNewConnection(m_connectAs);
         Debug.Log("CLIENT: New connection was established.");
         Debug.Log("CONNECTION - info: " + Connection.socket.IsConnected);
     }
@@ -110,7 +112,7 @@ public class NakamaConnection : MonoBehaviour
         //If we have not yet established a connection with GetNewConnection
         if (Connection == null)
         {
-            Debug.Log("Not authenticated on the server. Please authenticate the device.");
+            Debug.LogError("Not authenticated on the server. Please authenticate the device.");
             return;
         }
 
