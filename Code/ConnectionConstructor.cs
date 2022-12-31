@@ -94,6 +94,17 @@ public static class ConnectionConstructor
     }
 
     public static string RandomCode(int codeLength)
+    {
+        string st = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        string code = "";
+
+        for (int i = 0; i < codeLength; i++)
+        {
+            code += st[Random.Range(0, st.Length)];
+        }
+        return code;
+    }
 
     public static string DeviceID()
     {
@@ -125,6 +136,9 @@ public static class ConnectionConstructor
     //     }
     //     Debug.Log("CLIENT: Session created successfuly");
     // }
+=======
+
+>>>>>>> a917a4a0d42605148d1bf0f92a846b54ad6e047a
 }
 
 
