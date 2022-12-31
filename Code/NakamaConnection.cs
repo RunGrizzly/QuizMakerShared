@@ -132,7 +132,6 @@ public class NakamaConnection : MonoBehaviour
             Debug.Log("MATCH EXCEPTION: " + e);
         }
 
-
         //If we get a hit (1 is returned)
         if (info.Matches.Count() == 1)
         {
@@ -157,6 +156,4 @@ public class NakamaConnection : MonoBehaviour
             Debug.Log("No matches were found with " + roomQuery);
         }
     }
-
-
 }

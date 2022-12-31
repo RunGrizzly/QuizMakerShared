@@ -105,6 +105,24 @@ public static class ConnectionConstructor
         }
         return deviceID;
     }
+
+    // public static async void NewSession(ConnectionType connectAs, IClient client)
+    // {
+    //     //New Session////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //     Debug.Log("CLIENT: Creating session");
+    //     ISession newSession = null;
+
+    //     try
+    //     {
+    //         newSession = connectAs == ConnectionType.Client ? await client.AuthenticateDeviceAsync(DeviceID(), "New Client", true) : await client.AuthenticateDeviceAsync(DeviceID(), "New Host", true);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Debug.LogWarning("EXCEPTION: Client could not be authenticated. A session was not started.");
+    //         Debug.LogWarning("EXCEPTION: " + e);
+    //     }
+    //     Debug.Log("CLIENT: Session created successfuly");
+    // }
 }
 
 
