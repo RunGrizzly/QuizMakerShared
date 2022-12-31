@@ -93,6 +93,18 @@ public static class ConnectionConstructor
         return stringRoots[Random.Range(0, stringRoots.Length)] + "_" + stringBases[Random.Range(0, stringBases.Length)] + "_" + stringMods[Random.Range(0, stringMods.Length)];
     }
 
+    public static string RandomCode(int codeLength)
+    {
+        string st = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        string code = "";
+
+        for (int i = 0; i < codeLength; i++)
+        {
+            code += st[Random.Range(0, st.Length)];
+        }
+        return code;
+    }
 
     public static string DeviceID()
     {
@@ -105,6 +117,8 @@ public static class ConnectionConstructor
         }
         return deviceID;
     }
+
+
 }
 
 
