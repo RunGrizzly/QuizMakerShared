@@ -93,6 +93,7 @@ public static class ConnectionConstructor
         return stringRoots[Random.Range(0, stringRoots.Length)] + "_" + stringBases[Random.Range(0, stringBases.Length)] + "_" + stringMods[Random.Range(0, stringMods.Length)];
     }
 
+    public static string RandomCode(int codeLength)
 
     public static string DeviceID()
     {
@@ -106,6 +107,7 @@ public static class ConnectionConstructor
         return deviceID;
     }
 
+<<<<<<< HEAD
     // public static async void NewSession(ConnectionType connectAs, IClient client)
     // {
     //     //New Session////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
